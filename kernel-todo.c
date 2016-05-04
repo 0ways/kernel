@@ -2,6 +2,7 @@
 struct exception {
   // TODO
 };
+typedef struct exception exception;
 /**
  * This function initializes the kernel and its data structures and leaves
  * the kernel in start-up mode. The init_kernel call must be made before any
@@ -175,4 +176,129 @@ exception send_wait(Mailbox* mBox, void* Data) {
   }
   return status;
 }
-
+/**
+ * This call will attempt to receive a Message from the specified Mailbox. if there is a send_wait or
+ * sen_no_wait Message waiting for a receive_wait or a receive_no_wait Message on the specified Mailbox,
+ * receive_wait will collect it. if the Message was of send_wait type the sending task will will be moved to
+ * the readyList. Otherwise, if there is not a send Message(of either type) waiting on the specified Mailbox
+ * the receiving task will be blocked. In both cases (blocked or not blocked) a new task schedule is done
+ * and possibly a context switch. During the blocking period of the task its deadline might be reached. At
+ * that point in time the blocked task will be resumed with the exception: DEADLINE_REACHED.
+ * @argument --> *mBox: a pointer to the specified Mailbox
+ *           --> *Data: a pointer to a memory area where the data of the communicated Message is to be stored
+ * @return exception: The exception return parameter can have two possible values.
+ *           --> OK: Normal function, no exception occurred.
+ *           -->DEADLINE_REACHED: This return parameter is given if the receiving tasks' deadline is reached
+ *                                while it is blocked by the receive_wait call.
+ */
+exception receive_wait(Mailbox* mBox, void* Data) {
+  // 1. disable interrupt
+  // 2. save context
+  // 3. if(first execution) {
+  //      Set: "not first execution any more";
+  //      if(send Message is waiting) {
+  //        copy sender's data to receiving task's data area;
+  //        remove sending task's Message struct from the Mailbox;
+  //        if(Message was of wait type) {
+  //          Move sending task to ReadyList;
+  //        }else{
+  //          free senders data area;
+  //        }
+  //      }
+  //      else
+  //      {
+  //        Allocate a Message structure;
+  //        add message to the mailbox;
+  //        move receiving task from readyList to waitingList;
+  //      }
+  //      load context;
+  //   }
+  //   else
+  //   {
+  //     if(deadline is reached) {
+  //       disable interrupt;
+  //       remove receive message;
+  //       enable interrupt;
+  //       return DEADLINE_REACHED;
+  //     }
+  //     else
+  //     {
+  //       return OK;
+  //     }
+  //   }
+  exception status;
+  if (mBox && Data) {
+    return status;
+  }
+  return status;
+}
+/**
+ * This call will send a message to the specified Mailbox. The sending task will continue execution after
+ * the call. When the Mailbox is full, the oldest Message will be overwriten. The send_no_wait call will
+ * imply a new scheduling and possibly a context switch. Note: send_no_wait and send_wait Message shall not
+ * be mixed in the same Mailbox.
+ * @argument --> *mBox: a pointer to the specified Mailbox
+ *           --> *Data: a pointer to a memory area where the data of the communicated Message is residing
+ * @return Description of the function's status, i.e FAIL/OK
+ */
+exception send_no_wait(Mailbox* mBox, void* Data) {
+  // 1. disable interrupt
+  // 2. save context
+  // 3. if (first execution) {
+  //      set: "not first execution anymore"
+  //      if(receiving task is waiting) {
+  //        copy data to receiving tasks' data area;
+  //        remove receiving task's Message struct from the Mailbox;
+  //        Move receiving task to ReadyList;
+  //        Load context;
+  //      }
+  //      else
+  //      {
+  //        allocate a message structure;
+  //        copy data to the message;
+  //        if (mailbox is full) {
+  //          remove the oldest message struct;
+  //        }
+  //        add message to the Mailbox;
+  //      }
+  //    }
+  //    return status;
+  exception status;
+  if (mBox && Data) {
+    return status;
+  }
+  return status;
+}
+/**
+ * This call will attempt to receive a Message from the specified Mailbox. The calling task will continue
+ * execution after the call. when there is no send message available, or if the Mailbox is empty, the
+ * function will return FAIL. Otherwise, OK is returned.The call might imply a new scheduling and possibly
+ * a context switch.
+ * @argument --> *mBox: a pointer to the specified Mailbox.
+ *           --> *Data: a pointer to the Message
+ * @return --> integer indicating whether or not a message was received(OK/FAIL).
+ */
+exception receive_no_wait(Mailbox* mBox, void* Data) {
+  // 1. disable interrupt
+  // 2. save context
+  // 3. if(first execution) {
+  //      set: "not first execution any more";
+  //      if(send message is waiting) {
+  //        copy sender's data to receiving task's data area;
+  //        remove sending task's message struct from the mailbox;
+  //        if(message was of wait type) {
+  //          move sending task to readyList;
+  //        }else {
+  //          free sender's data area;
+  //        }
+  //      }
+  //      load context;
+  //    }
+  // 4. return status on received message
+  exception status;
+  if (mBox && Data) {
+    return status;
+  }
+  return status;
+}
+/////////////////////////////////////Timing function///////////////////////////////////////////////
