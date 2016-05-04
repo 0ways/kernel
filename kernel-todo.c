@@ -302,3 +302,133 @@ exception receive_no_wait(Mailbox* mBox, void* Data) {
   return status;
 }
 /////////////////////////////////////Timing function///////////////////////////////////////////////
+/**
+ * This call will block the calling task util the given number of ticks has expired.
+ * @argument nTicks: the duration given in number of ticks
+ * @return exception: The exception return parameter can have two possible values:
+ *                   -->OK: normal function, no exception occurred.
+ *                   -->DEADLINE_REACHED: This return parameter is given if the receiving tasks' deadline
+ *                                  is reached while it is blocked by the receive_wait call.
+ */
+exception wait(uint nTicks) {
+  // 1. disable interrupt
+  // 2. save context
+  // if(first execution) {
+  //    set: "not first execution any more"
+  //    place running task in the timerlist;
+  //    load context;
+  // }
+  // else
+  // {
+  //   if(deadline is reached) {
+  //      status is DEADLINE_REACHED;
+  //   }
+  //   else
+  //   {
+  //      status is OK;
+  //   }
+  // }
+  // return status;
+  exception status;
+  if (nTicks) {
+    return status;
+  }
+  return status;
+}
+/**
+ * This call will set the tick counter to the given value.
+ *@argument nTicks: the new value of the tick counter.
+ *@return none
+ */
+void set_ticks(uint nTicks) {
+  // 1. Set the tick counter;
+  if (nTicks) {
+    return;
+  }
+}
+/**
+ * This call will return the current value of the tick counter
+ * @argument --> none
+ * @return  --> a 32 bit value of the tick counter
+ */
+uint ticks(void) {
+  // 1. return the tick counter;
+  return 1;
+}
+/**
+ * This call will return the deadline of the specified task
+ *@argument --> none
+ *@return --> the deadline of the given task
+ */
+uint deadline(void) {
+  // 1. return the deadline of the current task;
+  return 1;
+}
+/**
+ * This call will set the deadline for the calling task. The task will be rescheduled and a context switch
+ * might occur.
+ * @argument --> deadline: the new deadline given in number of ticks
+ * @return --> none
+ */
+void set_deadline(uint deadline) {
+   // 1. disable interrupt
+   // 2. save context
+   // 3. if(first execution) {
+   //      Set: "not first execution any more";
+   //      Set the deadline field in the calling TCB;
+   //      Reschedule ReadyList;
+   //      load context;
+   //    }
+   if (deadline) {
+     return;
+   }
+}
+/**
+ * This function is not available for the user to call. It is called by an ISR (interrupt Service Routine)
+ * invoked every tick. Note, context is antomatically saved prior to call and automatically loaded on
+ * function exit.
+ * @argument --> none
+ * @return --> none
+ */
+void TimerInt(void) {
+  // 1. Increment tick counter;
+  // 2. Check the TimerList for tasks that are ready for execution, move these to ReadyList;
+  // 3. Check the WaitingList for tasks that have expired deadlines, move these to ReadyList;
+}
+/**
+ * This function is hardware dependent. All relevant registers are saved to the TCB of the currently
+ * running task.
+ * @argument --> none
+ * @return --> none
+ */
+void SaveContext(void) {
+  // 1. Save PC in Running->PC;
+  // 2. Save r0-r12 in Running->Context;
+  // 3. Save SP in Running->SP;
+}
+/**
+ * This function is hardware dependent. All relevant registers are restored from the TCB of the currently
+ * running task to the CPU registers.
+ */
+void LoadContext(void) {
+  // 1. Load r0-r12 from Running->Context;
+  // 2. Set SP to Running->SP;
+  // 3. Enable Interrupts;
+  // 4. Restore PC from Running->PC;
+  // 5. Jump to Running->PC;
+}
+/**
+ * This function is not available for the user to call. It is an ISR(interrupt Service Routine) invoked
+ * every tick. Note : It calls the c-function TimerInt()
+ */
+void timer0_isr(void) {
+   // 1. disable interrupts;
+   // 2. Save r0-r12 in Running->Context;
+   // 3. Save SP in Running->SP;
+   // 4. Call C-function TimerInt();
+   // 5. Load r0-r12 from Running->Context;
+   // 6. Set SP to Running->SP;
+   // 7. Enable Interrupts;
+   // 8. Restore PC from Running->PC;
+   // 9. Jump to Running->PC;
+}
